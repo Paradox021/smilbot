@@ -76,6 +76,18 @@ export const help: Command = {
           { name: 'Categories', value: commandCategories, inline: true }
         );
 
+      if (matchedCommand.usage) {
+        embed.addFields({ name: 'Usage', value: `\`${matchedCommand.usage}\``, inline: false });
+      }
+
+      if (matchedCommand.examples && matchedCommand.examples.length > 0) {
+        embed.addFields({
+          name: 'Examples',
+          value: matchedCommand.examples.map(ex => `• \`${ex}\``).join('\n'),
+          inline: false,
+        });
+      }
+
       await message.reply({ embeds: [embed] });
       return;
     }

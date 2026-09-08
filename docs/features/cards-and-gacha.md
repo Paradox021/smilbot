@@ -61,3 +61,16 @@ La suerte se evalúa comparando la distribución real obtenida frente al valor p
 * Se requiere un mínimo de **20 tiradas gacha** (`minPulls = 20`) para evitar anomalías estadísticas producidas por cuentas con pocas tiradas.
 * El comando `.top luck` (o `.topluck`) muestra a los 5 jugadores con mayor suerte, mientras que `.top luck worst` (o `.topluck worst`) muestra a los 5 más desafortunados.
 
+---
+
+## 6. Creación Administrativa de Cartas (`.createcard`)
+
+Los administradores del servidor pueden registrar nuevas cartas coleccionables para que pasen a formar parte del catálogo global y del pool gacha:
+
+* **Control de Acceso:** Protegido por el middleware `checkAdmin`, requiriendo permiso de Administrador de Discord o un rol denominado `admin`/`ADMIN`.
+* **Soporte de Nombres con Espacios:** Permite comillas dobles para nombres compuestos (ej. `"Dark Magician"`).
+* **Resolución Flexible de Imagen:**
+  1. Si se adjunta un archivo de imagen en el mensaje de Discord, se procesa prioritariamente.
+  2. Si no hay archivo adjunto, el comando extrae la URL de imagen al final del mensaje, la descarga en memoria y elimina el enlace de la descripción para mantener un lore limpio.
+* **Integración:** El bot empaqueta la imagen y los metadatos en `multipart/form-data` y los envía a `POST /card` en el backend, respondiendo con una previsualización de la carta creada (`createCardEmbed`).
+

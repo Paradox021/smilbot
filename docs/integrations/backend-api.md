@@ -74,6 +74,7 @@ La variable de entorno `BACKEND_URL` en `.env` define el host base de la API.
 | Endpoint | Método | Descripción | Retorno |
 | :--- | :--- | :--- | :--- |
 | `/card` | `GET` | Catálogo de todas las cartas | `Card[]` |
+| `/card` | `POST` | Creación de carta (`multipart/form-data`) | `Card` |
 | `/user/:discordId/card/random` | `POST` | Tirada gacha (descuenta 100 monedas) | `Card` |
 
 ### D. Mercado Libre (`marketService.ts`)

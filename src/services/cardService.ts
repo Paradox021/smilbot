@@ -11,6 +11,13 @@ export interface Card {
   imageUrl: string;
 }
 
+export interface CreateCardData {
+  name: string;
+  type: string;
+  description: string;
+  author: string;
+}
+
 export class CardService {
   constructor(private readonly http: AxiosInstance) {}
 
@@ -21,6 +28,23 @@ export class CardService {
 
   async getAllCards(): Promise<Card[]> {
     const { data } = await this.http.get<Card[]>('/card');
+    return data;
+  }
+
+  async createCard(
+    cardData: CreateCardData,
+    imageBuffer: Buffer,
+    fileName = 'card.png'
+  ): Promise<Card> {
+    const formData = new FormData();
+    formData.append('image', new Blob([new Uint8Array(imageBuffer)]), fileName);
+    formData.append('data', JSON.stringify(cardData));
+
+    const { data } = await this.http.post<Card>('/card', formData, {
+      headers: {
+        'Content-Type': undefined,
+      },
+    });
     return data;
   }
 }

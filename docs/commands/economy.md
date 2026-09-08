@@ -107,3 +107,30 @@ Todos los comandos de esta categoría requieren el prefijo `.` por defecto y apl
   ```
 * **Alias adicionales:** `.leaderboard`, `.ranking`.
 
+---
+
+## 10. `.createcard` / `.newcard` / `.addcard` *(Admin)*
+* **Descripción:** Crea y registra una nueva carta coleccionable en el catálogo global de Smilbot.
+* **Permisos requeridos:** Poseer el permiso de Discord `Administrator` o un rol denominado `admin` / `ADMIN` en el servidor.
+* **Middleware aplicado:** `checkAdmin`.
+* **Sintaxis:**
+  ```text
+  .createcard <nombre | "nombre con espacios"> <rareza> <descripcion> [url_imagen]
+  ```
+* **Parámetros:**
+  * `nombre`: Nombre de la carta. Si contiene espacios, debe ir entre comillas dobles (ej: `"Dragon Blanco"`). Si es una sola palabra, las comillas son opcionales.
+  * `rareza`: Rareza de la carta. Opciones válidas: `common`, `rare`, `epic`, `legendary`, `mythic`.
+  * `descripcion`: Texto descriptivo, cita o lore de la carta.
+  * `imagen`: Puede suministrarse de dos formas:
+    1. **Archivo adjunto:** Adjuntando directamente la imagen (`.png`, `.jpg`, `.webp`, etc.) en el mensaje de Discord.
+    2. **URL directa:** Añadiendo el enlace a la imagen al final del comando. El sistema descargará la imagen y limpiará la URL de la descripción para mantener el lore impecable.
+* **Ejemplos de uso:**
+  ```text
+  # Con archivo adjunto:
+  .createcard "El Pana Miguel" mythic Se le ve bastante fresco, no te voy a mentir.
+
+  # Con URL de imagen al final:
+  .createcard "Gato Pan" legendary Un gatito atrapado en una rebanada de pan https://i.imgur.com/gatopan.png
+  ```
+* **Respuesta:** En caso de éxito, el bot responde con la vista detallada de la carta recién creada (`createCardEmbed`) mostrando la imagen, rareza y autor.
+

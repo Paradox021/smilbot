@@ -8,6 +8,8 @@ import { CommandCategory } from './CommandCategory';
 export interface Command {
   name: string;
   description: string;
+  usage?: string;
+  examples?: string[];
   aliases?: string[];
   categories?: CommandCategory[];
   middlewares?: Middleware[];

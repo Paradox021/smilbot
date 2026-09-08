@@ -21,7 +21,7 @@ docs/
 │   └── music.md                       # Sistema de música y cola de reproducción
 │
 ├── commands/                          # Referencia de comandos (sintaxis, alias y ejemplos)
-│   ├── economy.md                     # Comandos de economía, cartas y mercado
+│   ├── economy.md                     # Comandos de economía, cartas, mercado y administración
 │   ├── music.md                       # Comandos de reproducción musical
 │   └── utility.md                     # Comandos de utilidad y ayuda
 │
