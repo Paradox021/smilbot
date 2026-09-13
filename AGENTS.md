@@ -8,27 +8,26 @@ Este documento establece los principios de trabajo, la arquitectura del proyecto
 
 ## 🚨 Regla de Oro: Definición de Terminado (Definition of Done)
 
-> **NINGUNA tarea, cambio o implementación se considera completada sin haber actualizado o creado la documentación correspondiente en `docs/`.**
+> **NINGUNA tarea, cambio o implementación se considera completada sin haber actualizado o creado la documentación correspondiente en la Bóveda Centralizada de Obsidian.**
+
+### 📚 Bóveda Centralizada de Obsidian (Single Source of Truth)
+- **Ruta de la Bóveda:** `F:\smilbot-project\smilbot-vault` (disponible vía servidor MCP `obsidian_vault` o en disco).
+- Esta bóveda es la **única fuente de verdad compartida** entre el **Bot de Discord** y el **Backend API**.
 
 Antes de entregar una respuesta final o cerrar un cambio:
-1. Si creaste o modificaste un comando, actualiza `docs/commands/`.
-2. Si alteraste o creaste lógica de un subsistema (ej. economía, cartas, música), actualiza `docs/features/`.
-3. Si cambiaste endpoints, payloads, variables de entorno o interacción con la API REST, actualiza `docs/integrations/backend-api.md` y `.env.sample`.
-4. Si cambiaste la arquitectura interna o componentes UI, actualiza `docs/architecture/`.
-5. Si agregaste un archivo nuevo a `docs/`, agrégalo al mapa en `docs/README.md`.
+1. **Comandos y UI:** Si creaste o modificaste un comando o interacción, actualiza la nota correspondiente en `F:\smilbot-project\smilbot-vault\Bot Discord\`.
+2. **Lógica de Negocio y Reglas:** Si alteraste o creaste lógica de un subsistema (ej. economía, cartas, gacha, música, rachas), actualiza `F:\smilbot-project\smilbot-vault\Modelos y Contratos\`.
+3. **Contratos de API REST:** Si cambiaste endpoints, parámetros, payloads, variables de entorno o interacción con el backend, actualiza `F:\smilbot-project\smilbot-vault\Backend API\` y `.env.sample`.
+4. Si agregaste una nota nueva a Obsidian, enlázala en `00 - Inicio.md`.
 
 ---
 
 ## 📁 Estructura del Proyecto
 
 - `src/`: Código fuente en TypeScript (comandos, eventos, servicios, clientes de API, utilidades).
-- `docs/`: Documentación técnica y funcional del bot.
-  - `docs/architecture/`: Visión general y componentes UI interactivos.
-  - `docs/features/`: Lógica interna de negocio (economía, cartas, mercado, música).
-  - `docs/commands/`: Referencia de comandos clasificados por categoría.
-  - `docs/integrations/`: Contratos de integración externa (ej. Backend API).
 - `openspec/`: Especificaciones y configuraciones de OpenSpec.
 - `.agents/`: Reglas, skills y flujos de trabajo para agentes de IA.
+- **Documentación Técnica:** Centralizada externamente en `F:\smilbot-project\smilbot-vault`.
 
 ---
 

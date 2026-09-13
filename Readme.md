@@ -70,15 +70,12 @@ Los comandos del bot utilizan el prefijo `.` por defecto.
 
 ---
 
-## 📚 Documentación Completa
-
-Para consultar la documentación técnica completa, arquitectura interna y especificaciones de endpoints, visita la carpeta [**`docs/`**](./docs/README.md):
-
-* 🏛️ [Arquitectura del Bot](./docs/architecture/overview.md)
-* 🎨 [Componentes y UI Interactiva](./docs/architecture/ui-and-components.md)
-* 💰 [Economía, Rachas y Analíticas](./docs/features/economy-and-streaks.md)
-* 🃏 [Cartas y Sistema Gacha](./docs/features/cards-and-gacha.md)
-* 🏪 [Mercado Libre](./docs/features/market.md)
-* 🎵 [Reproductor de Música](./docs/features/music.md)
-* 📖 [Referencia de Comandos](./docs/commands/economy.md)
-* 🔌 [Integración con Backend API](./docs/integrations/backend-api.md)
+## 📚 Documentación Técnica
+ 
+ Toda la documentación técnica, especificaciones de endpoints, arquitectura y modelos de datos están centralizados en la bóveda de Obsidian:
+ 
+ 👉 **[Repositorio de Documentación (smilbot-vault)](https://github.com/Paradox021/smilbot-vault)**
+ 
+- 📐 **Modelos y Contratos:** Esquemas de cartas, reglas de economía, gacha y mercado.
+- 🔌 **Backend API:** Especificaciones y contratos de endpoints REST.
+- 🤖 **Bot Discord:** Arquitectura modular, componentes UI y referencia de comandos.
