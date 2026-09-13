@@ -18,7 +18,7 @@ Antes de entregar una respuesta final o cerrar un cambio:
 1. **Comandos y UI:** Si creaste o modificaste un comando o interacción, actualiza la nota correspondiente en `F:\smilbot-project\smilbot-vault\Bot Discord\`.
 2. **Lógica de Negocio y Reglas:** Si alteraste o creaste lógica de un subsistema (ej. economía, cartas, gacha, música, rachas), actualiza `F:\smilbot-project\smilbot-vault\Modelos y Contratos\`.
 3. **Contratos de API REST:** Si cambiaste endpoints, parámetros, payloads, variables de entorno o interacción con el backend, actualiza `F:\smilbot-project\smilbot-vault\Backend API\` y `.env.sample`.
-4. Si agregaste una nota nueva a Obsidian, enlázala en `00 - Inicio.md`.
+4. Si agregaste una nota nueva a Obsidian, enlázala en `README.md`.
 
 ---
 
