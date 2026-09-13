@@ -9,6 +9,7 @@
     "start": "node dist/index.js"
   },
   "keywords": [
+    "smilbot",
     "discord-bot",
     "discordjs",
     "gacha",
