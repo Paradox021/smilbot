@@ -101,7 +101,7 @@ export const createCard: Command = {
             timeout: 8000,
           });
 
-          const contentType = response.headers['content-type'] || '';
+          const contentType = String(response.headers['content-type'] || '');
           if (!contentType.startsWith('image/')) {
             await message.reply({
               embeds: [
