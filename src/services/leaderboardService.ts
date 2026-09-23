@@ -9,6 +9,7 @@ export interface RarityBreakdown {
   epic: number;
   legendary: number;
   mythic: number;
+  pityMythics?: number;
 }
 
 export interface UserLuckStats {
@@ -18,6 +19,7 @@ export interface UserLuckStats {
   tier: string;
   tierCode: LuckTierCode;
   eligibleForLeaderboard: boolean;
+  pityMythicsCount?: number;
   breakdown: RarityBreakdown;
 }
 

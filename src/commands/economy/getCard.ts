@@ -18,7 +18,12 @@ export const getCard: Command = {
             // Backend handles balance check and deduction
             const card = await cardService.buyRandomCard(discordId);
 
+            const content = card.isPity
+                ? '🌟 **Smilbot took pity on your bad luck and granted you a guaranteed Mythic card!**'
+                : undefined;
+
             message.reply({
+                content,
                 embeds: [createCardEmbed(card)]
             });
 

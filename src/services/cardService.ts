@@ -2,6 +2,12 @@ import { AxiosInstance } from 'axios';
 import { api } from './api';
 import { CardType } from '@/types/CardType';
 
+export interface CardPityProgress {
+  current: number;
+  threshold: number;
+  remaining: number;
+}
+
 export interface Card {
   _id: string;
   name: string;
@@ -9,6 +15,9 @@ export interface Card {
   description: string;
   author: string;
   imageUrl: string;
+  roll?: number | null;
+  isPity?: boolean;
+  pity?: CardPityProgress;
 }
 
 export interface CreateCardData {

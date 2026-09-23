@@ -23,6 +23,15 @@ function getLuckTierEmoji(tierCode?: string): string {
   }
 }
 
+function createProgressBar(current: number, total: number, size = 10): string {
+  if (total <= 0) return '▱'.repeat(size);
+  const percentage = Math.min(Math.max(current / total, 0), 1);
+  const filled = Math.round(percentage * size);
+  const empty = size - filled;
+  const pctStr = (percentage * 100).toFixed(1).replace(/\.0$/, '');
+  return `${'▰'.repeat(filled)}${'▱'.repeat(empty)} **${pctStr}%**`;
+}
+
 function formatLuckField(luck?: UserLuckStats, cardsOpenedCount: number = 0): string {
   if (!luck) {
     return '• Rating: ⏳ No gacha pulls yet (minimum 20 required)';
@@ -37,9 +46,11 @@ function formatLuckField(luck?: UserLuckStats, cardsOpenedCount: number = 0): st
 
   const emoji = getLuckTierEmoji(luck.tierCode);
   const bd = luck.breakdown;
-  const breakdownStr = bd
-    ? `${bd.common ?? 0}⚪  ${bd.rare ?? 0}🟢  ${bd.epic ?? 0}🟣  ${bd.legendary ?? 0}🟡  ${bd.mythic ?? 0}🔴`
-    : '';
+  let breakdownStr = '';
+  if (bd) {
+    const pityStr = bd.pityMythics && bd.pityMythics > 0 ? ` (+${bd.pityMythics} Pity)` : '';
+    breakdownStr = `${bd.common ?? 0}⚪  ${bd.rare ?? 0}🟢  ${bd.epic ?? 0}🟣  ${bd.legendary ?? 0}🟡  ${bd.mythic ?? 0}🔴${pityStr}`;
+  }
 
   const lines = [
     `• Rating: ${emoji} **${luck.tier}** (${luck.luckDelta})`,
@@ -99,6 +110,17 @@ export const stats: Command = {
               `• Packs Opened: **${userStats.cardsOpenedCount ?? 0}**`,
               `• Market Sales: **${userStats.marketSalesCount ?? 0}**`,
             ].join('\n'),
+            inline: true,
+          },
+          {
+            name: '✨ Gacha Pity',
+            value: userStats.pity
+              ? [
+                  `• Progress: **${userStats.pity.pullsSinceLastMythic ?? 0}/${userStats.pity.pityThreshold ?? 250}**`,
+                  `• Guaranteed In: **${userStats.pity.pullsUntilGuaranteed ?? 250}** pulls`,
+                  `• ${createProgressBar(userStats.pity.pullsSinceLastMythic ?? 0, userStats.pity.pityThreshold ?? 250)}`,
+                ].join('\n')
+              : '• No pity data available',
             inline: true,
           },
           {

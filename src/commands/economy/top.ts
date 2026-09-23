@@ -85,9 +85,11 @@ export const top: Command = {
         const medal = MEDALS[index] || `${index + 1}.`;
         const emoji = getLuckTierEmoji(item.tierCode);
         const bd = item.breakdown;
-        const breakdownStr = bd
-          ? `${bd.common ?? 0}⚪  ${bd.rare ?? 0}🟢  ${bd.epic ?? 0}🟣  ${bd.legendary ?? 0}🟡  ${bd.mythic ?? 0}🔴`
-          : '';
+        let breakdownStr = '';
+        if (bd) {
+          const pityStr = bd.pityMythics && bd.pityMythics > 0 ? ` (+${bd.pityMythics} Pity)` : '';
+          breakdownStr = `${bd.common ?? 0}⚪  ${bd.rare ?? 0}🟢  ${bd.epic ?? 0}🟣  ${bd.legendary ?? 0}🟡  ${bd.mythic ?? 0}🔴${pityStr}`;
+        }
 
         return {
           name: `${medal} ${item.username} — ${emoji} ${item.tier} (\`${item.luckDelta}\`)`,

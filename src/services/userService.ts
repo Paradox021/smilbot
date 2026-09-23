@@ -38,6 +38,13 @@ export interface UserWithCards {
   cardsOpenedCount?: number;
 }
 
+export interface UserPityStats {
+  pullsSinceLastMythic: number;
+  pityThreshold: number;
+  pullsUntilGuaranteed: number;
+  pityMythicsCount: number;
+}
+
 export interface UserStats {
   discordId: string;
   username: string;
@@ -51,6 +58,7 @@ export interface UserStats {
   cardsCount: number;
   cardsOpenedCount: number;
   marketSalesCount: number;
+  pity?: UserPityStats;
   luck?: UserLuckStats;
 }
 
