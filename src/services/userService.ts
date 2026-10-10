@@ -49,10 +49,17 @@ export interface UserStats {
   discordId: string;
   username: string;
   avatarUrl?: string | null;
+  createdAt?: string | null;
   balance: number;
+  /** Effective streak: 0 if it already broke (>48h since lastDaily). */
   dailyStreak: number;
   maxDailyStreak: number;
   previousMaxStreak?: number;
+  lastDaily?: string;
+  /** When the next daily can be claimed (in the past = available now). */
+  nextDailyAt?: string;
+  /** When the current streak breaks, or null if there is no active streak. */
+  streakExpiresAt?: string | null;
   totalDailiesClaimed: number;
   totalCoinsEarned: number;
   totalCoinsSpent: number;

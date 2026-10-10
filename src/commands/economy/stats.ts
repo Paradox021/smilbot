@@ -1,4 +1,4 @@
-import { userService } from '@/services/userService';
+import { userService, UserStats } from '@/services/userService';
 import { Command } from '@/types/Command';
 import { CommandCategory } from '@/types/CommandCategory';
 import { createTextEmbed } from '@/components/embeds';
@@ -62,6 +62,26 @@ function formatLuckField(luck?: UserLuckStats, cardsOpenedCount: number = 0): st
 }
 
 /**
+ * Daily availability and streak expiry, using Discord relative timestamps.
+ * Both dates come from the backend, which owns the 23h cooldown / 48h streak rules.
+ */
+function formatDailyStatus(userStats: UserStats): string[] {
+  const lines: string[] = [];
+  if (userStats.nextDailyAt) {
+    const next = Date.parse(userStats.nextDailyAt);
+    lines.push(
+      next <= Date.now()
+        ? '• Next Daily: **available now**'
+        : `• Next Daily: <t:${Math.floor(next / 1000)}:R>`
+    );
+  }
+  if (userStats.streakExpiresAt) {
+    lines.push(`• Streak Ends: <t:${Math.floor(Date.parse(userStats.streakExpiresAt) / 1000)}:R>`);
+  }
+  return lines;
+}
+
+/**
  * Stats command to check user's economic profile, streaks, and activity
  */
 export const stats: Command = {
@@ -100,6 +120,7 @@ export const stats: Command = {
               `• Current Streak: **${userStats.dailyStreak ?? 0}** days`,
               `• Max Record Streak: **${userStats.maxDailyStreak ?? 0}** days`,
               `• Dailies Claimed: **${userStats.totalDailiesClaimed ?? 0}** times`,
+              ...formatDailyStatus(userStats),
             ].join('\n'),
             inline: true,
           },
