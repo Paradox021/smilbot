@@ -1,47 +1,43 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, AxiosError } from 'axios';
 import { api } from './api';
 import { Card } from './cardService';
 
+export type MarketOfferStatus = 'ACTIVE' | 'SOLD' | 'CANCELLED';
+
 /**
- * Market offer interface
+ * Market offer as returned by GET /market/:serverId/offers(/:offerId)
  */
 export interface MarketOffer {
   _id: string;
   seller: {
+    _id: string;
     discordId: string;
     username: string;
   };
   cardId: Card;
   price: number;
   serverId: string;
+  status?: MarketOfferStatus;
 }
 
 /**
- * Parameters for buying an offer
+ * Discord user acting on the market. The backend creates the user if it does not exist,
+ * so the username is always sent.
  */
-export interface BuyOfferParams {
-  serverId: string;
-  offerId: string;
-  buyerDiscordId: string;
+export interface MarketActor {
+  discordId: string;
+  username: string;
 }
 
-/**
- * Parameters for adding an offer
- */
-export interface AddOfferParams {
+export interface AddOfferParams extends MarketActor {
   serverId: string;
-  sellerDiscordId: string;
   cardId: string;
   price: number;
 }
 
-/**
- * Parameters for removing an offer
- */
-export interface RemoveOfferParams {
+export interface OfferActionParams extends MarketActor {
   serverId: string;
   offerId: string;
-  sellerDiscordId: string;
 }
 
 /**
@@ -51,9 +47,7 @@ export class MarketService {
   constructor(private readonly http: AxiosInstance) {}
 
   /**
-   * Gets all offers for a server
-   * @param serverId Discord server ID
-   * @returns Array of market offers
+   * Gets all active offers for a server
    */
   async getAllOffers(serverId: string): Promise<MarketOffer[]> {
     const { data } = await this.http.get<MarketOffer[]>(`/market/${serverId}/offers`);
@@ -61,64 +55,57 @@ export class MarketService {
   }
 
   /**
-   * Adds a new offer to the market
-   * @param params Offer parameters
-   * @returns The created offer
+   * Gets a specific offer (any status). Returns null if it does not exist.
    */
-  async addOffer(params: AddOfferParams): Promise<MarketOffer> {
-    const { data } = await this.http.post<MarketOffer>(
-      `/market/${params.serverId}/offers`,
-      {
-        sellerDiscordId: params.sellerDiscordId,
-        cardId: params.cardId,
-        price: params.price,
-      }
-    );
+  async getOfferById(serverId: string, offerId: string): Promise<MarketOffer | null> {
+    try {
+      const { data } = await this.http.get<MarketOffer>(`/market/${serverId}/offers/${offerId}`);
+      return data;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 404) return null;
+      throw error;
+    }
+  }
+
+  /**
+   * Publishes a card from the seller's inventory. The card is held until it is sold or cancelled.
+   */
+  async addOffer({ serverId, discordId, username, cardId, price }: AddOfferParams): Promise<MarketOffer> {
+    const { data } = await this.http.post<MarketOffer>(`/market/${serverId}/offers`, {
+      discordId,
+      username,
+      cardId,
+      price,
+    });
     return data;
   }
 
   /**
-   * Buys an offer from the market
-   * @param params Purchase parameters
+   * Buys an active offer
    */
-  async buyOffer(params: BuyOfferParams): Promise<void> {
-    await this.http.post(
-      `/market/${params.serverId}/offers/${params.offerId}/buy`,
-      {
-        buyerDiscordId: params.buyerDiscordId,
-      }
-    );
+  async buyOffer({ serverId, offerId, discordId, username }: OfferActionParams): Promise<void> {
+    await this.http.post(`/market/${serverId}/offers/${offerId}/buy`, { discordId, username });
   }
 
   /**
-   * Removes an offer from the market
-   * @param params Removal parameters
+   * Cancels an active offer of the seller and returns the card to their inventory
    */
-  async removeOffer(params: RemoveOfferParams): Promise<void> {
-    await this.http.delete(
-      `/market/${params.serverId}/offers/${params.offerId}`,
-      {
-        data: { sellerDiscordId: params.sellerDiscordId },
-      }
-    );
+  async removeOffer({ serverId, offerId, discordId, username }: OfferActionParams): Promise<void> {
+    await this.http.delete(`/market/${serverId}/offers/${offerId}`, {
+      data: { discordId, username },
+    });
   }
+}
 
-  /**
-   * Gets a specific offer by ID
-   * @param serverId Discord server ID
-   * @param offerId Offer ID
-   * @returns The market offer or null if not found
-   */
-  async getOfferById(serverId: string, offerId: string): Promise<MarketOffer | null> {
-    try {
-      const { data } = await this.http.get<MarketOffer>(
-        `/market/${serverId}/offers/${offerId}`
-      );
-      return data;
-    } catch {
-      return null;
-    }
+/**
+ * Extracts the error message sent by the backend ({ error }) or a fallback
+ */
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof AxiosError) {
+    const backendError = (error.response?.data as { error?: unknown } | undefined)?.error;
+    if (typeof backendError === 'string') return backendError;
   }
+  return fallback;
 }
 
 export const marketService = new MarketService(api);

@@ -5,7 +5,7 @@ import {
   Interaction,
   MessageFlags,
 } from 'discord.js';
-import { marketService, MarketOffer } from '@/services/marketService';
+import { marketService, MarketOffer, getApiErrorMessage } from '@/services/marketService';
 import {
   createMarketListEmbed,
   createEmptyMarketEmbed,
@@ -143,11 +143,26 @@ export async function handleMarketBuy(
   const buyerId = interaction.user.id;
 
   // Get offer details before purchase
-  const offer = await marketService.getOfferById(serverId, offerId);
-
-  if (!offer) {
+  let offer: MarketOffer | null;
+  try {
+    offer = await marketService.getOfferById(serverId, offerId);
+  } catch (error) {
     await interaction.update({
-      embeds: [createPurchaseResultEmbed(null, false, 'This offer no longer exists.')],
+      embeds: [
+        createPurchaseResultEmbed(
+          null,
+          false,
+          getApiErrorMessage(error, 'Failed to load the offer. Please try again.')
+        ),
+      ],
+      components: [],
+    });
+    return;
+  }
+
+  if (!offer || (offer.status && offer.status !== 'ACTIVE')) {
+    await interaction.update({
+      embeds: [createPurchaseResultEmbed(null, false, 'This offer is no longer available.')],
       components: [],
     });
     return;
@@ -166,7 +181,8 @@ export async function handleMarketBuy(
     await marketService.buyOffer({
       serverId,
       offerId,
-      buyerDiscordId: buyerId,
+      discordId: buyerId,
+      username: interaction.user.username,
     });
 
     // Clear selection
@@ -183,8 +199,8 @@ export async function handleMarketBuy(
       ],
       components: [],
     });
-  } catch (error: any) {
-    const message = error.response?.data?.message || 'Failed to complete purchase. Please try again.';
+  } catch (error) {
+    const message = getApiErrorMessage(error, 'Failed to complete purchase. Please try again.');
     await interaction.update({
       embeds: [createPurchaseResultEmbed(null, false, message)],
       components: [],

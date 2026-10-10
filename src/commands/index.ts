@@ -10,6 +10,8 @@ import { show } from './economy/show';
 import { allCards } from './economy/allCards';
 import { createCard } from './economy/createCard';
 import { market } from './economy/market';
+import { sell } from './economy/sell';
+import { cancelSale } from './economy/cancelSale';
 import { stats } from './economy/stats';
 import { top } from './economy/top';
 import { help } from './utility/help';
@@ -30,6 +32,8 @@ export const commandList: Command[] = [
   allCards,
   createCard,
   market,
+  sell,
+  cancelSale,
   top,
   help,
 ];
