@@ -5,7 +5,7 @@
 
 Smilbot es un bot de Discord enfocado en coleccionar cartas, gestionar una economía virtual y reproducir música.
 
-> **Nota de Versiones:** Este repositorio está en la rama de la **versión 2.0** (reescrito completamente en TypeScript y con sistema de música mejorado usando `discord-player`). La versión legacy estable la puedes encontrar en el tag [**v1.0**](https://github.com/Paradox021/Smilbot/releases/tag/v1.0).
+> **Nota de Versiones:** Este repositorio está en la rama de la **versión 2.0** (reescrito completamente en TypeScript y con sistema de música mejorado usando `discord-player`). La versión legacy estable la puedes encontrar en el tag [**v1.0**](https://github.com/Paradox021/smilbot/releases/tag/v1.0).
 
 ## Requisitos
 - Node.js 18 o superior
@@ -15,7 +15,7 @@ Smilbot es un bot de Discord enfocado en coleccionar cartas, gestionar una econo
 ## Instalación
 1. Clona este repositorio y navega hasta la carpeta.
    ```bash
-   git clone https://github.com/Paradox021/Smilbot.git
+   git clone https://github.com/Paradox021/smilbot.git
    cd Smilbot
    ```
 2. Ejecuta `npm install` para instalar las dependencias.
