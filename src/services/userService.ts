@@ -48,6 +48,7 @@ export interface UserPityStats {
 export interface UserStats {
   discordId: string;
   username: string;
+  avatarUrl?: string | null;
   balance: number;
   dailyStreak: number;
   maxDailyStreak: number;
@@ -60,6 +61,22 @@ export interface UserStats {
   marketSalesCount: number;
   pity?: UserPityStats;
   luck?: UserLuckStats;
+}
+
+/**
+ * Fields accepted by PATCH /user/:discordId/profile (at least one required).
+ * `avatar` is the Discord avatar hash, or null when the user has no custom avatar.
+ */
+export interface UserProfileUpdate {
+  username?: string;
+  avatar?: string | null;
+}
+
+export interface UserProfile {
+  discordId: string;
+  username: string;
+  avatar: string | null;
+  avatarUrl: string | null;
 }
 
 export class UserService {
@@ -113,6 +130,18 @@ export class UserService {
    */
   async getUserStats(discordId: string): Promise<UserStats> {
     const { data } = await this.http.get<UserStats>(`/user/${discordId}/stats`);
+    return data;
+  }
+
+  /**
+   * Syncs the user's Discord profile (username and/or avatar hash) into the backend.
+   * Bot-only endpoint: PATCH /user/:discordId/profile
+   * @param discordId Discord user ID
+   * @param profile Fields to update (at least one)
+   * @returns Updated profile as stored by the backend
+   */
+  async updateProfile(discordId: string, profile: UserProfileUpdate): Promise<UserProfile> {
+    const { data } = await this.http.patch<UserProfile>(`/user/${discordId}/profile`, profile);
     return data;
   }
 }

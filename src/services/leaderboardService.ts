@@ -27,6 +27,7 @@ export interface LuckLeaderboardItem {
   rank: number;
   discordId: string;
   username: string;
+  avatarUrl?: string | null;
   totalCards: number;
   luckPercentage: number;
   luckDelta: string;
