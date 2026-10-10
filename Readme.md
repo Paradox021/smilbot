@@ -23,6 +23,8 @@ Smilbot es un bot de Discord enfocado en coleccionar cartas, gestionar una econo
    ```env
    TOKEN=tu_token_de_discord
    BACKEND_URL=https://url.de.tu.backend
+   # Debe ser idéntica a BOT_API_KEY del backend
+   BOT_API_KEY=tu_api_key_del_bot
    ```
 4. Inicia el bot en entorno de desarrollo:
    ```bash
