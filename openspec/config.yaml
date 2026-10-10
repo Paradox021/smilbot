@@ -2,22 +2,22 @@ schema: spec-driven
 
 # Project context
 context: |
-  Smilbot: Bot de Discord modular en TypeScript (Discord.js).
-  Toda la documentación técnica y funcional reside estrictamente en la carpeta docs/.
-  Estructura de docs/: architecture/, features/, commands/, integrations/.
+  Smilbot: Bot de Discord modular en TypeScript (Discord.js v14).
+  Documentation Policy: La Bóveda Centralizada de Obsidian (smilbot-vault, accesible vía el servidor MCP obsidian_vault o su ruta local) es la única fuente de verdad compartida con el Backend API y el Frontend. No existe carpeta docs/ en este repo.
+  Notas del bot en la bóveda: Bot Discord/ (Arquitectura y Eventos, Comandos de *, Componentes de UI). Contratos de API en Backend API/ y reglas de juego en Modelos y Contratos/.
 
 # Per-artifact rules
 rules:
   proposal:
-    - Explicitly mention which files in docs/ will be created or updated.
+    - Always list affected Obsidian Vault notes under the Impact section.
   tasks:
-    - Always include a dedicated task to update or create documentation in docs/ for any feature, command, integration, or schema change.
+    - Always include a dedicated task to update the Obsidian Vault notes for any command, feature, integration or UI change.
 
 # Per-operation guidance
 operations:
   apply:
     guidance:
-      - Never consider a change or task complete until documentation in docs/ has been written and verified.
+      - Never consider a change or task complete until the Obsidian Vault notes have been updated and verified against the code.
   archive:
     guidance:
-      - Verify that docs/ changes are consistent and committed before archiving.
+      - Confirm that the Obsidian Vault reflects all capabilities introduced by the archived change.
