@@ -2,6 +2,7 @@ import { Interaction, Client, MessageFlags } from 'discord.js';
 import { handleCardInteraction } from './CardInteractions';
 import { handleMarketInteraction } from './MarketInteractions';
 import { handleHelpInteraction } from './HelpInteractions';
+import { handleStreakInteraction } from './StreakInteractions';
 
 /**
  * Main interaction handler that routes to specific handlers
@@ -27,6 +28,9 @@ export async function handleInteraction(
     // Try market interactions (handles both buttons and select menus)
     const marketHandled = await handleMarketInteraction(interaction, client);
     if (marketHandled) return;
+
+    const streakHandled = await handleStreakInteraction(interaction, client);
+    if (streakHandled) return;
 
     // Add more handlers here as needed...
 
@@ -57,3 +61,4 @@ export async function handleInteraction(
 export { handleCardInteraction } from './CardInteractions';
 export { handleMarketInteraction } from './MarketInteractions';
 export { handleHelpInteraction } from './HelpInteractions';
+export { handleStreakInteraction } from './StreakInteractions';

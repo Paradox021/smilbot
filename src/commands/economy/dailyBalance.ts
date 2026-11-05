@@ -52,6 +52,15 @@ export const dailyBalance: Command = {
         lines.push(``, `🎉 **New Personal Record!** You've surpassed your previous record of **${prevMaxStreak}** days!`);
       } else if (streak === 1 && prevStreak >= 2) {
         lines.push(``, `💔 Your previous streak of **${prevStreak}** days was broken. Starting fresh!`);
+
+        // Restorable for a while: show the price and the deadline (also when short on coins, so they can save up)
+        const restore = res.streakRestore;
+        if (restore?.expiresAt && (restore.available || restore.reason === 'INSUFFICIENT_BALANCE')) {
+          const deadline = Math.floor(Date.parse(restore.expiresAt) / 1000);
+          lines.push(
+            `🩹 Use \`.restore\` to get it back for **${restore.cost?.toLocaleString()}** coins before <t:${deadline}:R>.`
+          );
+        }
       }
 
       message.reply({

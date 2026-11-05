@@ -4,6 +4,7 @@ import { play } from './player/play';
 import { stop } from './player/stop';
 import { balance } from './economy/balance';
 import { dailyBalance } from './economy/dailyBalance';
+import { restoreStreak } from './economy/restoreStreak';
 import { getCard } from './economy/getCard';
 import { myCards } from './economy/myCards';
 import { show } from './economy/show';
@@ -25,6 +26,7 @@ export const commandList: Command[] = [
   stop,
   balance,
   dailyBalance,
+  restoreStreak,
   stats,
   getCard,
   myCards,
