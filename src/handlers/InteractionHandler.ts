@@ -3,6 +3,7 @@ import { handleCardInteraction } from './CardInteractions';
 import { handleMarketInteraction } from './MarketInteractions';
 import { handleHelpInteraction } from './HelpInteractions';
 import { handleStreakInteraction } from './StreakInteractions';
+import { handleMusicInteraction } from './MusicInteractions';
 
 /**
  * Main interaction handler that routes to specific handlers
@@ -31,6 +32,9 @@ export async function handleInteraction(
 
     const streakHandled = await handleStreakInteraction(interaction, client);
     if (streakHandled) return;
+
+    const musicHandled = await handleMusicInteraction(interaction, client);
+    if (musicHandled) return;
 
     // Add more handlers here as needed...
 
@@ -62,3 +66,4 @@ export { handleCardInteraction } from './CardInteractions';
 export { handleMarketInteraction } from './MarketInteractions';
 export { handleHelpInteraction } from './HelpInteractions';
 export { handleStreakInteraction } from './StreakInteractions';
+export { handleMusicInteraction } from './MusicInteractions';

@@ -1,59 +1,65 @@
 import { Command } from '@/types/Command';
 import { CommandCategory } from '@/types/CommandCategory';
 import { createTextEmbed } from '@/components/embeds';
-import { Client, GuildTextBasedChannel, Message } from 'discord.js';
-import { canSendMessages } from '@/utils/typeGuards';
+import { Client, Message } from 'discord.js';
 import { HEADROOM_FILTER } from '@/utils/audioFilters';
 import { musicLog } from '@/utils/musicDebug';
+import { MusicQueueMetadata } from '@/types/MusicQueueMetadata';
+import { sendMusicReply, MUSIC_ERROR_COLOR } from '@/utils/musicQueue';
+import { LEAVE_ON_EMPTY_COOLDOWN_MS, LEAVE_ON_END_COOLDOWN_MS } from '@/utils/musicOptions';
 
 /**
  * Command to play a song
  */
 export const play: Command = {
     name: 'play',
-    description: 'Plays a song from YouTube or Spotify',
+    description: 'Plays a song or playlist from YouTube or Spotify (name or URL)',
+    usage: '.play <name or URL>',
+    examples: ['.play bad bunny dtmf', '.p https://youtu.be/dQw4w9WgXcQ'],
     aliases: ['p'],
     categories: [CommandCategory.PLAYER],
     async execute(message: Message, args: string[], client: Client) {
         const voiceChannel = message.member?.voice.channel;
-          
-        if (!canSendMessages(message.channel)) {
-            return
+
+        if (!message.channel.isSendable() || !message.guildId) {
+            return;
         }
 
         if (!voiceChannel) {
-            message.channel.send({
-                embeds: [
-                    createTextEmbed(0xFF0000, `${message.author} you must be in a voice channel to do this!`)
-                ]
-            });
-            message.delete();
+            await sendMusicReply(message, createTextEmbed(MUSIC_ERROR_COLOR, `${message.author} you must be in a voice channel to do this!`));
             return;
         }
 
         const query = args.join(" ");
         if (!query) {
-            message.channel.send({
-                embeds: [
-                    createTextEmbed(0xFF0000, "Please provide the name or URL of the song.")
-                ]
-            });
-            
-            message.delete();
+            await sendMusicReply(message, createTextEmbed(MUSIC_ERROR_COLOR, "Please provide the name or URL of the song."));
+            return;
+        }
+
+        // Si el bot ya está en otro canal de voz del servidor, no se lo "roba" a quien lo está usando.
+        const existingQueue = client.player.nodes.get(message.guildId);
+        if (existingQueue?.channel && existingQueue.channel.id !== voiceChannel.id) {
+            await sendMusicReply(
+                message,
+                createTextEmbed(MUSIC_ERROR_COLOR, `${message.author} I'm already playing in ${existingQueue.channel}. Join that channel to add songs.`),
+            );
             return;
         }
 
         try {
-            const player = client.player;
             const start = Date.now();
             musicLog(`.play "${query}" received`);
 
-            // Llama a la función play de discord-player
-            await player.play(voiceChannel, query, {
+            const metadata: MusicQueueMetadata = { channel: message.channel, nowPlayingMessage: null };
+            await client.player.play(voiceChannel, query, {
+                requestedBy: message.author,
                 nodeOptions: {
-                    metadata: {
-                        channel: message.channel
-                    },
+                    metadata,
+                    // Margen antes de salir del canal, para que un nuevo .play no tenga que reconectar
+                    leaveOnEnd: true,
+                    leaveOnEndCooldown: LEAVE_ON_END_COOLDOWN_MS,
+                    leaveOnEmpty: true,
+                    leaveOnEmptyCooldown: LEAVE_ON_EMPTY_COOLDOWN_MS,
                     // Baja 3 dB antes de convertir a 16 bits para evitar distorsión en canciones con máster muy alto
                     defaultFFmpegFilters: [HEADROOM_FILTER],
                     // Sin procesado DSP en JavaScript (ecualizador, biquad, filtros, resampler, volumen): no se usa
@@ -68,14 +74,10 @@ export const play: Command = {
             musicLog(`.play "${query}" resolved in ${Date.now() - start}ms`);
 
             // Elimina el mensaje original para limpiar el canal
-            message.delete();
-          } catch (e: any) {
+            await message.delete().catch(() => {});
+        } catch (e: unknown) {
             console.error('Error in .play:', e);
-            message.channel.send({
-                embeds: [
-                    createTextEmbed(0xFF0000, "An error occurred while trying to play the song.")
-                ]
-            });
-          }
+            await sendMusicReply(message, createTextEmbed(MUSIC_ERROR_COLOR, "An error occurred while trying to play the song."));
+        }
     }
 }

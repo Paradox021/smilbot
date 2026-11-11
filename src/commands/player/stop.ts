@@ -1,56 +1,41 @@
 import { Command } from '@/types/Command';
 import { CommandCategory } from '@/types/CommandCategory';
 import { createTextEmbed } from '@/components/embeds';
-import { Client, Message, GuildTextBasedChannel } from 'discord.js';
-import { canSendMessages } from '@/utils/typeGuards';
+import { Client, Message } from 'discord.js';
+import { sendMusicReply, MUSIC_COLOR, MUSIC_ERROR_COLOR } from '@/utils/musicQueue';
+import { stopQueue } from '@/utils/musicActions';
 
 /**
- * Command to stop the queue
+ * Command to stop the music, clear the queue and leave the voice channel
  */
 export const stop: Command = {
     name: 'stop',
-    description: 'Stops the current queue playback',
+    description: 'Stops the music, clears the queue and leaves the voice channel',
+    usage: '.stop',
     aliases: ['leave'],
     categories: [CommandCategory.PLAYER],
     async execute(message: Message, args: string[], client: Client) {
         const voiceChannel = message.member?.voice.channel;
-        
-        if (!canSendMessages(message.channel)) {
+        const queue = message.guildId ? client.player.nodes.get(message.guildId) : null;
+
+        if (!queue) {
+            await sendMusicReply(message, createTextEmbed(MUSIC_ERROR_COLOR, "I'm not playing anything."));
             return;
         }
 
-        if (!voiceChannel) {
-            message.channel.send({
-                embeds: [
-                    createTextEmbed(0xFF0000, `${message.author} you must be in a voice channel to do this!`)
-                ]
-            });
-            message.delete();
+        // Funciona aunque no suene nada (p. ej. esperando tras acabar la cola), pero solo desde el mismo canal.
+        if (!voiceChannel || (queue.channel && queue.channel.id !== voiceChannel.id)) {
+            const where = queue.channel ? ` ${queue.channel}` : ' my voice channel';
+            await sendMusicReply(message, createTextEmbed(MUSIC_ERROR_COLOR, `${message.author} you must be in${where} to do this!`));
             return;
         }
 
         try {
-            const queue = client.player.nodes.get(message.guildId!);
-
-            if (queue) {
-                // Elimina la cola y desconecta el bot (cumpliendo tu requerimiento)
-                queue.delete();
-            }
-            
-            // Envía un mensaje confirmando que se ha detenido la cola
-            message.channel.send({
-                embeds: [
-                    createTextEmbed(0x00569D, "Stopped the queue and left the channel!")
-                ]
-            });
-            message.delete();
-        } catch (e: any) {
-            console.error(e.name, e.message);
-            message.channel.send({
-                embeds: [
-                    createTextEmbed(0xFF0000, "An error occurred while trying to stop playback.")
-                ]
-            });
+            stopQueue(queue);
+            await sendMusicReply(message, createTextEmbed(MUSIC_COLOR, `⏹️ ${message.author} stopped the music and left the channel.`));
+        } catch (e: unknown) {
+            console.error('Error in .stop:', e);
+            await sendMusicReply(message, createTextEmbed(MUSIC_ERROR_COLOR, "An error occurred while trying to stop playback."));
         }
     }
 };

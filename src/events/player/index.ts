@@ -4,6 +4,9 @@ import { audioTrackAdd } from './audioTrackAdd';
 import { emptyQueue } from './emptyQueue';
 import { error } from './error';
 import { playerError } from './playerError';
+import { audioTracksAdd } from './audioTracksAdd';
+import { queueDelete } from './queueDelete';
+import { playerPause, playerResume } from './playerPauseResume';
 
 /**
  * Array with all the Player events
@@ -14,4 +17,8 @@ export const playerEvents = [
     emptyQueue,
     error,
     playerError,
+    audioTracksAdd,
+    queueDelete,
+    playerPause,
+    playerResume,
 ];
