@@ -11,6 +11,6 @@ export interface MusicQueueMetadata {
   nowPlayingMessage?: Message | null;
   /** Song shown in nowPlayingMessage, to turn it into a "Played/Skipped/Stopped" message when it ends */
   nowPlayingTrack?: Track | null;
-  /** Set by skip so the finished message says "Skipped" instead of "Played" */
-  skipRequested?: boolean;
+  /** Label for the current song's message when it stops (set by skip / previous); defaults to "Played" */
+  endLabel?: string | null;
 }

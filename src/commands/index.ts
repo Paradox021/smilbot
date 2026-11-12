@@ -11,6 +11,10 @@ import { loop } from './player/loop';
 import { shuffle } from './player/shuffle';
 import { remove } from './player/remove';
 import { clear } from './player/clear';
+import { search } from './player/search';
+import { lyrics } from './player/lyrics';
+import { previous } from './player/previous';
+import { skipTo } from './player/skipTo';
 import { balance } from './economy/balance';
 import { dailyBalance } from './economy/dailyBalance';
 import { restoreStreak } from './economy/restoreStreak';
@@ -32,7 +36,10 @@ import { help } from './utility/help';
 export const commandList: Command[] = [
   ping,
   play,
+  search,
   skip,
+  skipTo,
+  previous,
   pause,
   resume,
   nowPlaying,
@@ -41,6 +48,7 @@ export const commandList: Command[] = [
   shuffle,
   remove,
   clear,
+  lyrics,
   stop,
   balance,
   dailyBalance,

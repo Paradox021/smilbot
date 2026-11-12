@@ -84,6 +84,18 @@ export function createFinishedSongEmbed(track: Track, label: string): EmbedBuild
 }
 
 /**
+ * Embed with the results of `.search`, numbered to match the select menu
+ */
+export function createSearchResultsEmbed(query: string, tracks: Track[], expiresInSeconds: number): EmbedBuilder {
+  const lines = tracks.map((track, i) => `\`${i + 1}.\` ${trackLink(track)}\n${track.author} · \`${trackDuration(track)}\``);
+  return new EmbedBuilder()
+    .setColor(MUSIC_COLOR)
+    .setTitle(`🔎 Results for "${query.slice(0, 100)}"`)
+    .setDescription(lines.join('\n\n'))
+    .setFooter({ text: `Choose a song from the menu · expires in ${expiresInSeconds}s` });
+}
+
+/**
  * Embed with one page of the queue (current song + upcoming songs)
  * @param queue Guild queue
  * @param state Pagination state over the upcoming songs

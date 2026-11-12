@@ -1,4 +1,4 @@
-import { ButtonInteraction, Client, Interaction, MessageFlags } from 'discord.js';
+import { ButtonInteraction, Client, Interaction, MessageFlags, StringSelectMenuInteraction } from 'discord.js';
 import { createNowPlayingEmbed, createQueueEmbed, createTextEmbed, trackLink } from '@/components/embeds';
 import {
   MUSIC_QUEUE_PREFIX,
@@ -6,7 +6,10 @@ import {
   createMusicControlButtons,
   createQueueButtons,
   parseMusicControlCustomId,
+  parseSearchCustomId,
 } from '@/components/buttons';
+import { resolvePlaybackChannel, startPlayback } from '@/utils/musicPlay';
+import { clearPendingSearch, getPendingSearch } from '@/utils/musicSearch';
 import { createPaginationState, goToPage, parsePaginationCustomId } from '@/components/pagination';
 import { MusicQueueMetadata } from '@/types/MusicQueueMetadata';
 import { MusicQueue, MUSIC_COLOR, MUSIC_ERROR_COLOR, QUEUE_ITEMS_PER_PAGE, resolveControllableQueue } from '@/utils/musicQueue';
@@ -96,9 +99,74 @@ async function handleQueuePage(interaction: ButtonInteraction, client: Client, t
 }
 
 /**
+ * Handles the `.search` select menu (play the chosen result) and its cancel button
+ */
+async function handleSearchInteraction(
+  interaction: StringSelectMenuInteraction | ButtonInteraction,
+  client: Client,
+  parsed: { action: 'select' | 'cancel'; ownerId: string },
+): Promise<void> {
+  if (interaction.user.id !== parsed.ownerId) {
+    await interaction.reply({
+      embeds: [createTextEmbed(MUSIC_ERROR_COLOR, 'Only the user who searched can choose. Use `.search` yourself!')],
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const messageId = interaction.message.id;
+  if (parsed.action === 'cancel') {
+    clearPendingSearch(messageId);
+    await interaction.update({ embeds: [createTextEmbed(0x5A5F66, '🔎 Search cancelled.')], components: [] });
+    return;
+  }
+
+  const pending = getPendingSearch(messageId);
+  const index = interaction.isStringSelectMenu() ? Number(interaction.values[0]) : NaN;
+  const track = pending?.tracks[index];
+  if (!pending || !track) {
+    await interaction.update({ embeds: [createTextEmbed(0x5A5F66, '🔎 This search expired. Use `.search` again.')], components: [] });
+    return;
+  }
+
+  // Se vuelve a comprobar el canal: puede haber cambiado desde que buscó.
+  const member = interaction.inCachedGuild() ? interaction.member : null;
+  const target = resolvePlaybackChannel(member, client, interaction.guildId);
+  if ('error' in target || !interaction.channel?.isSendable()) {
+    const error = 'error' in target ? target.error : 'I cannot send messages in this channel.';
+    const text = `${error.charAt(0).toUpperCase()}${error.slice(1)}`;
+    await interaction.reply({ embeds: [createTextEmbed(MUSIC_ERROR_COLOR, text)], flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  clearPendingSearch(messageId);
+  musicLog(`search: ${interaction.user.tag} chose "${track.title}"`);
+  // Responder ya (Discord da 3 s); la reproducción puede tardar un par de segundos.
+  await interaction.update({
+    embeds: [createTextEmbed(MUSIC_COLOR, `🔎 ${interaction.user} chose ${trackLink(track)}`)],
+    components: [],
+  });
+
+  try {
+    await startPlayback(client, target.voiceChannel, track, interaction.channel, interaction.user);
+  } catch (e: unknown) {
+    console.error('Error playing search result:', e);
+    await interaction.followUp({ embeds: [createTextEmbed(MUSIC_ERROR_COLOR, 'An error occurred while trying to play the song.')] });
+  }
+}
+
+/**
  * Main router for music interactions
  */
 export async function handleMusicInteraction(interaction: Interaction, client: Client): Promise<boolean> {
+  if (interaction.isStringSelectMenu() || interaction.isButton()) {
+    const search = parseSearchCustomId(interaction.customId);
+    if (search) {
+      await handleSearchInteraction(interaction, client, search);
+      return true;
+    }
+  }
+
   if (!interaction.isButton()) return false;
 
   const action = parseMusicControlCustomId(interaction.customId);

@@ -77,12 +77,13 @@ export const FINISHED_LABELS = {
   played: '✅ Played',
   skipped: '⏭️ Skipped',
   stopped: '⏹️ Stopped',
+  wentBack: '⏮️ Went back to the previous song',
 } as const;
 
 /**
- * Turns the current "Now playing" message into its final state (Played / Skipped / Stopped):
+ * Turns the current "Now playing" message into its final state (Played / Skipped / Stopped…):
  * removes the live end time and the buttons. Called when the song stops playing.
- * @param label Label to show; by default "Skipped" if a skip was requested, otherwise "Played"
+ * @param label Label to show; by default the one set by skip/previous (metadata.endLabel), otherwise "Played"
  */
 export async function finalizeNowPlayingMessage(queue: MusicQueue, label?: string): Promise<void> {
   const metadata = queue.metadata;
@@ -90,10 +91,10 @@ export async function finalizeNowPlayingMessage(queue: MusicQueue, label?: strin
   if (!metadata || !message) return;
 
   const track = metadata.nowPlayingTrack;
-  const finalLabel = label ?? (metadata.skipRequested ? FINISHED_LABELS.skipped : FINISHED_LABELS.played);
+  const finalLabel = label ?? metadata.endLabel ?? FINISHED_LABELS.played;
   metadata.nowPlayingMessage = null;
   metadata.nowPlayingTrack = null;
-  metadata.skipRequested = false;
+  metadata.endLabel = null;
 
   const payload = track
     ? { embeds: [createFinishedSongEmbed(track, finalLabel)], components: [] }
